@@ -17,10 +17,7 @@ function addUserInformation() {
 
             // Get the container where the user info should be added
             const container = document.querySelector('.top-container'); // Select the specific container
-
-            // Prevent duplicate user information panels
-            if (container.querySelector('.user-info-panel')) {
-                return;
+            
             }
 
             // Create a document fragment for better performance
