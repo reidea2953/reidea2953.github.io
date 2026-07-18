@@ -1,24 +1,38 @@
 function addUserInformation() {
 
-    const basePath = "Config/userinformation.txt";
+
+    let basePath = "";
+
+
+    if (window.location.pathname.includes("/Projects/")) {
+
+        basePath = "../../Config/userinformation.txt";
+
+    } 
+    else if (window.location.pathname.includes("/HTML/")) {
+
+        basePath = "../Config/userinformation.txt";
+
+    } 
+    else {
+
+        basePath = "Config/userinformation.txt";
+
+    }
+
+
 
     fetch(basePath)
-        .then(response => {
 
-            if (!response.ok) {
-                throw new Error("Could not load user information");
-            }
+        .then(response => response.text())
 
-            return response.text();
-
-        })
         .then(data => {
 
 
             const lines = data
                 .split("\n")
-                .map(line => line.trim())
-                .filter(line => line !== "");
+                .map(line => line.trim());
+
 
 
             const [
@@ -35,31 +49,44 @@ function addUserInformation() {
 
 
             if (!container) {
-                console.error("top-container not found");
                 return;
             }
 
 
-            // Prevent duplicates
+
+            // Prevent duplicate creation
+
             if (document.querySelector(".user-info-panel")) {
+
                 return;
+
             }
+
+
+
+            const fragment = document.createDocumentFragment();
 
 
 
             const userInfoPanel = document.createElement("div");
+
             userInfoPanel.className = "user-info-panel";
+
 
 
 
             // Profile picture
 
             const img = document.createElement("img");
+
             img.src = profilePicUrl;
+
             img.alt = "Profile Picture";
+
             img.className = "profile-pic";
 
             userInfoPanel.appendChild(img);
+
 
 
 
@@ -68,18 +95,23 @@ function addUserInformation() {
             const userNameLink = document.createElement("a");
 
             userNameLink.href = "index.html";
+
             userNameLink.className = "user-name-link";
+
 
 
             const userName = document.createElement("h1");
 
             userName.className = "user-name";
+
             userName.textContent = profileName;
+
 
 
             userNameLink.appendChild(userName);
 
             userInfoPanel.appendChild(userNameLink);
+
 
 
 
@@ -93,6 +125,7 @@ function addUserInformation() {
 
 
 
+
             // Location
 
             const locationContainer = document.createElement("div");
@@ -100,10 +133,13 @@ function addUserInformation() {
             locationContainer.className = "user-location-container";
 
 
+
             const locationIcon = document.createElement("span");
 
             locationIcon.className = "material-symbols-outlined";
+
             locationIcon.textContent = "near_me";
+
 
 
             const userLocation = document.createElement("h2");
@@ -113,10 +149,13 @@ function addUserInformation() {
 
 
             locationContainer.appendChild(locationIcon);
+
             locationContainer.appendChild(userLocation);
 
 
+
             userInfoPanel.appendChild(locationContainer);
+
 
 
 
@@ -129,7 +168,8 @@ function addUserInformation() {
 
 
 
-            const iconMap = {
+
+            const socialIconMap = {
 
                 "x.com": "fa-brands fa-x-twitter",
                 "facebook.com": "fa-brands fa-square-facebook",
@@ -137,21 +177,28 @@ function addUserInformation() {
                 "discord.gg": "fa-brands fa-discord",
                 "instagram.com": "fa-brands fa-instagram",
                 "youtube.com": "fa-brands fa-youtube",
-                "linkedin.com": "fa-brands fa-linkedin",
+                "linkedin.com": "fab fa-linkedin",
                 "artstation.com": "fa-brands fa-artstation",
-                "github.com": "fa-brands fa-github",
-                "twitch.tv": "fa-brands fa-twitch",
-                "email": "fa-solid fa-envelope"
+                "github.com": "fab fa-github",
+                "twitch.tv": "fab fa-twitch",
+                "email": "fas fa-envelope"
 
             };
+
 
 
 
             socials.forEach(social => {
 
 
-                let type = Object.keys(iconMap)
+                if (!social) {
+                    return;
+                }
+
+
+                let type = Object.keys(socialIconMap)
                     .find(key => social.includes(key));
+
 
 
                 let url = social;
@@ -161,21 +208,23 @@ function addUserInformation() {
                 if (!type) {
 
                     type = "email";
+
                     url = "mailto:" + social;
 
                 }
 
 
 
-                const link = document.createElement("a");
 
-                link.href = url;
+                const a = document.createElement("a");
+
+                a.href = url;
 
 
 
                 if (!url.startsWith("mailto:")) {
 
-                    link.target = "_blank";
+                    a.target = "_blank";
 
                 }
 
@@ -183,12 +232,14 @@ function addUserInformation() {
 
                 const icon = document.createElement("i");
 
-                icon.className = iconMap[type];
+                icon.className = socialIconMap[type];
 
 
-                link.appendChild(icon);
 
-                socialIcons.appendChild(link);
+                a.appendChild(icon);
+
+                socialIcons.appendChild(a);
+
 
 
             });
@@ -199,30 +250,27 @@ function addUserInformation() {
 
 
 
-            // IMPORTANT:
-            // Put profile before navigation buttons
+            fragment.appendChild(userInfoPanel);
 
-            const navigation = container.querySelector(".navigation-buttons");
 
+
+            // Keep original template order
 
             container.insertBefore(
-                userInfoPanel,
-                navigation
+                fragment,
+                container.querySelector(".navigation-buttons")
             );
 
 
         })
 
-        .catch(error => {
-
-            console.error(
-                "Error loading user information:",
-                error
-            );
-
-        });
+        .catch(error => console.error(
+            "Error loading user information:",
+            error
+        ));
 
 }
+
 
 
 
